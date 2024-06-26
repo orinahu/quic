@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const QUIC_URL = 'https://localhost:4433/webtransport';
+const QUIC_URL = 'https://127.0.0.1:4433/webtransport';
 
 const QuicClient = () => {
   const [message, setMessage] = useState('');
@@ -11,6 +11,7 @@ const QuicClient = () => {
       const transport = new WebTransport(QUIC_URL);
 
       await transport.ready;
+      console.log('WebTransport connection established');
 
       const writer = transport.datagrams.writable.getWriter();
       const encoder = new TextEncoder();
