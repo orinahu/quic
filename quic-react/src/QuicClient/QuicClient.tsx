@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const QUIC_URL = 'https://127.0.0.1:4433/webtransport';
+const QUIC_URL = 'https://localhost:4433/webtransport';
 
 const QuicClient = () => {
   const [message, setMessage] = useState('');
