@@ -21,9 +21,11 @@ const QuicClient = () => {
       writer.close();
 
       const reader = transport.datagrams.readable.getReader();
-      const { value, done } = await reader.read();
-      if (!done) {
-        const decoder = new TextDecoder();
+      const decoder = new TextDecoder();
+      
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
         const decodedResponse = decoder.decode(value);
         setResponse(decodedResponse);
       }

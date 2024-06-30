@@ -7,8 +7,11 @@ import (
 	"net/http"
 )
 
-func mainn() {
-	cert, err := tls.LoadX509KeyPair("localhost+2.pem", "localhost+2-key.pem")
+func main() {
+	certFile := "cert.pem"
+	keyFile := "key.pem"
+
+	cert, err := tls.LoadX509KeyPair(certFile, keyFile)
 	if err != nil {
 		log.Fatalf("Failed to load key pair: %s", err)
 	}

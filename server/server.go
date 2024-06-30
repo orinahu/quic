@@ -14,9 +14,12 @@ import (
 
 func main() {
 	// Replace with your mkcert-generated certificate and key
-	cert, err := tls.LoadX509KeyPair("localhost+2.pem", "localhost+2-key.pem")
+	certFile := "cert.pem"
+	keyFile := "key.pem"
+
+	cert, err := tls.LoadX509KeyPair(certFile, keyFile)
 	if err != nil {
-		log.Fatalf("failed to load key pair: %s", err)
+		log.Fatalf("failed to load key pair: %v", err)
 	}
 
 	tlsConfig := &tls.Config{
@@ -25,7 +28,7 @@ func main() {
 	}
 
 	h3Server := http3.Server{
-		Addr:      ":4433",
+		Addr:      "0.0.0.0:4433",
 		TLSConfig: tlsConfig,
 	}
 
@@ -37,6 +40,8 @@ func main() {
 		log.Println("Received WebTransport request")
 		session, err := wtServer.Upgrade(w, r)
 		if err != nil {
+			// Log specific error details
+			log.Printf("Failed to upgrade to WebTransport: %v", err)
 			http.Error(w, "Failed to upgrade to WebTransport", http.StatusInternalServerError)
 			return
 		}
@@ -45,7 +50,7 @@ func main() {
 	})
 
 	log.Println("Starting WebTransport server on port 4433")
-	if err := h3Server.ListenAndServeTLS("localhost+2.pem", "localhost+2-key.pem"); err != nil {
+	if err := h3Server.ListenAndServeTLS(certFile, keyFile); err != nil {
 		log.Fatalf("Failed to start WebTransport server: %v", err)
 	}
 }
@@ -54,7 +59,7 @@ func handleSession(session *webtransport.Session) {
 	for {
 		stream, err := session.AcceptStream(context.Background())
 		if err != nil {
-			log.Println("Failed to accept stream:", err)
+			log.Printf("Failed to accept stream: %v", err)
 			return
 		}
 		go handleStream(stream)
@@ -67,7 +72,7 @@ func handleStream(stream webtransport.Stream) {
 	buf := make([]byte, 1024)
 	n, err := stream.Read(buf)
 	if err != nil && err != io.EOF {
-		log.Println("Failed to read from stream:", err)
+		log.Printf("Failed to read from stream: %v", err)
 		return
 	}
 
@@ -76,6 +81,6 @@ func handleStream(stream webtransport.Stream) {
 	response := fmt.Sprintf("Echo: %s", string(buf[:n]))
 	_, err = stream.Write([]byte(response))
 	if err != nil {
-		log.Println("Failed to write to stream:", err)
+		log.Printf("Failed to write to stream: %v", err)
 	}
 }
