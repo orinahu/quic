@@ -13,7 +13,8 @@ import (
 )
 
 func main() {
-	cert, err := tls.LoadX509KeyPair("cert.pem", "key.pem")
+	// Replace with your mkcert-generated certificate and key
+	cert, err := tls.LoadX509KeyPair("localhost+2.pem", "localhost+2-key.pem")
 	if err != nil {
 		log.Fatalf("failed to load key pair: %s", err)
 	}
@@ -44,7 +45,7 @@ func main() {
 	})
 
 	log.Println("Starting WebTransport server on port 4433")
-	if err := h3Server.ListenAndServeTLS("cert.pem", "key.pem"); err != nil {
+	if err := h3Server.ListenAndServeTLS("localhost+2.pem", "localhost+2-key.pem"); err != nil {
 		log.Fatalf("Failed to start WebTransport server: %v", err)
 	}
 }
